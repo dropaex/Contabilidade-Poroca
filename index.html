@@ -318,7 +318,8 @@ h2{font-size:clamp(2.1rem,4.8vw,3.7rem)}
 .bubble .btn{width:100%;justify-content:center;margin-top:6px}
 .b-alt{margin-top:14px;text-align:center;font-size:.86rem;color:var(--ink2)}
 .b-alt a{color:var(--brand);font-weight:600;text-underline-offset:3px}
-.b-ok{margin-top:12px;padding:12px 14px;border-radius:16px;background:var(--bg3);font-size:.9rem;line-height:1.4}
+.btn[disabled]{opacity:.7;cursor:wait}
+.b-ok{margin:14px 0 0;padding:12px 14px;border-radius:16px;background:var(--bg3);font-size:.9rem;line-height:1.4}
 @media (max-width:480px){.fab{right:14px;bottom:14px}.bubble{right:12px;bottom:82px}}
 @media (prefers-reduced-motion:reduce){.bubble,.bubble.open,.fab,.fab svg{transition:none}}
 
@@ -601,16 +602,16 @@ h2{font-size:clamp(2.1rem,4.8vw,3.7rem)}
     <svg viewBox="0 0 240 260" aria-hidden="true"><use href="#logo"/></svg>
     <div>
       <h3 id="bTitle">Fale com a Contabilidade Poroca</h3>
-      <p>Escreva abaixo e abriremos o seu e-mail com a mensagem pronta para enviar.</p>
+      <p>Escreva sua mensagem e ela chega direto ao e-mail do escritório.</p>
     </div>
   </div>
   <div class="field"><label for="fNome">Seu nome</label><input id="fNome" type="text" autocomplete="name"></div>
   <div class="field"><label for="fContato">E-mail ou telefone para retorno</label><input id="fContato" type="text" autocomplete="email"></div>
   <div class="field"><label for="fMsg">Mensagem</label><textarea id="fMsg" rows="4"></textarea></div>
+  <p class="b-ok" id="fOk" role="status" hidden>Mensagem enviada! Obrigado pelo contato, responderemos assim que possível.</p>
   <p class="b-err" id="fErr" role="alert"></p>
-  <a class="btn btn-primary" id="fSend" href="mailto:contabilidadeporoca@gmail.com">Enviar mensagem <span class="ar" aria-hidden="true">→</span></a>
-  <p class="b-alt">Prefere o Gmail no navegador? <a id="fGmail" href="https://mail.google.com/mail/?view=cm&fs=1&to=contabilidadeporoca@gmail.com" target="_blank" rel="noopener">Abrir no Gmail</a></p>
-  <p class="b-ok" id="fOk" hidden>Abrimos o seu e-mail com a mensagem pronta. É só enviar.</p>
+  <button class="btn btn-primary" id="fSend" type="button"><span class="lbl">Enviar mensagem</span> <span class="ar" aria-hidden="true">→</span></button>
+  <p class="b-alt">Prefere usar o seu e-mail? <a id="fGmail" href="https://mail.google.com/mail/?view=cm&fs=1&to=contabilidadeporoca@gmail.com" target="_blank" rel="noopener">Gmail</a> · <a id="fMail" href="mailto:contabilidadeporoca@gmail.com">outro aplicativo</a></p>
 </div>
 
 <script>
@@ -634,36 +635,63 @@ h2{font-size:clamp(2.1rem,4.8vw,3.7rem)}
   var fab=d.getElementById('fab'), bubble=d.getElementById('bubble');
   var fNome=d.getElementById('fNome'), fContato=d.getElementById('fContato'), fMsg=d.getElementById('fMsg');
   var fErr=d.getElementById('fErr'), fOk=d.getElementById('fOk');
-  var fSend=d.getElementById('fSend'), fGmail=d.getElementById('fGmail');
-  var lastFocus=null;
+  var fSend=d.getElementById('fSend'), fGmail=d.getElementById('fGmail'), fMail=d.getElementById('fMail');
+  var lbl=fSend.querySelector('.lbl'), lastFocus=null;
+  var ENDPOINT='https://formsubmit.co/ajax/'+CONTATO.email;
 
   function compose(){
     var n=fNome.value.trim(), c=fContato.value.trim(), m=fMsg.value.trim();
     var subject='Contato pelo site'+(n?' — '+n:'');
     var body=(n?'Nome: '+n+'\n':'')+(c?'Contato para retorno: '+c+'\n':'')+((n||c)?'\n':'')+m;
-    body=body.replace(/\n/g,'\r\n');
-    return {subject:subject,body:body,msg:m};
+    return {n:n,c:c,m:m,subject:subject,body:body.replace(/\n/g,'\r\n')};
   }
   function refresh(){
     var x=compose();
     var q='subject='+encodeURIComponent(x.subject)+'&body='+encodeURIComponent(x.body);
-    fSend.href='mailto:'+CONTATO.email+'?'+q;
+    fMail.href='mailto:'+CONTATO.email+'?'+q;
     fGmail.href='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(CONTATO.email)+'&su='+encodeURIComponent(x.subject)+'&body='+encodeURIComponent(x.body);
     fErr.textContent='';
   }
-  [fNome,fContato,fMsg].forEach(function(el){el.addEventListener('input',refresh)});
-  function guard(e){
+  [fNome,fContato,fMsg].forEach(function(el){el.addEventListener('input',function(){refresh();fOk.hidden=true})});
+  function needMsg(e){
     if(!fMsg.value.trim()){
-      e.preventDefault();
+      if(e) e.preventDefault();
       fErr.textContent='Escreva sua mensagem para continuar.';
       fMsg.focus();
-      return;
+      return true;
     }
-    refresh();
-    fOk.hidden=false;
+    return false;
   }
-  fSend.addEventListener('click',guard);
-  fGmail.addEventListener('click',guard);
+  fGmail.addEventListener('click',needMsg);
+  fMail.addEventListener('click',needMsg);
+
+  function setBusy(on){
+    fSend.disabled=on;
+    fSend.setAttribute('aria-busy',on?'true':'false');
+    lbl.textContent=on?'Enviando…':'Enviar mensagem';
+  }
+  fSend.addEventListener('click',function(){
+    if(needMsg()) return;
+    var x=compose();
+    fErr.textContent='';fOk.hidden=true;setBusy(true);
+    var ctrl=('AbortController' in window)?new AbortController():null;
+    var timer=setTimeout(function(){if(ctrl)ctrl.abort()},12000);
+    fetch(ENDPOINT,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({nome:x.n,contato:x.c,mensagem:x.m,_subject:x.subject,_template:'table',_captcha:'false',_honey:''}),
+      signal:ctrl?ctrl.signal:undefined
+    }).then(function(r){
+      return r.json().catch(function(){return {}}).then(function(j){
+        if(r.ok && (j.success===true||j.success==='true')){
+          fOk.hidden=false;
+          fNome.value='';fContato.value='';fMsg.value='';refresh();
+        }else{ throw new Error('falha'); }
+      });
+    }).catch(function(){
+      fErr.textContent='Não conseguimos enviar agora. Use o Gmail ou o outro aplicativo abaixo, ou escreva para '+CONTATO.email+'.';
+    }).then(function(){ clearTimeout(timer); setBusy(false); });
+  });
 
   function openBubble(){
     lastFocus=d.activeElement;
