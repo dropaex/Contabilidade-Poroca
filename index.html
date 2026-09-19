@@ -644,7 +644,7 @@ h2{font-size:clamp(2.1rem,4.8vw,3.7rem)}
 
   function compose(){
     var n=fNome.value.trim(), c=fContato.value.trim(), m=fMsg.value.trim();
-    var subject='Contato pelo site'+(n?' — '+n:'');
+    var subject='Cliente do Site'+(n?' — '+n:'');
     var body=(n?'Nome: '+n+'\n':'')+(c?'Contato para retorno: '+c+'\n':'')+((n||c)?'\n':'')+m;
     return {n:n,c:c,m:m,subject:subject,body:body.replace(/\n/g,'\r\n')};
   }
@@ -668,6 +668,11 @@ h2{font-size:clamp(2.1rem,4.8vw,3.7rem)}
   fGmail.addEventListener('click',needMsg);
   fMail.addEventListener('click',needMsg);
 
+  function payload(x){
+    var o={nome:x.n,contato:x.c,mensagem:x.m,_subject:x.subject,_template:'table',_honey:''};
+    if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x.c)) o.email=x.c;   // permite "Responder" direto ao cliente
+    return o;
+  }
   function setBusy(on){
     fSend.disabled=on;
     fSend.setAttribute('aria-busy',on?'true':'false');
@@ -682,7 +687,7 @@ h2{font-size:clamp(2.1rem,4.8vw,3.7rem)}
     fetch(ENDPOINT,{
       method:'POST',
       headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify({nome:x.n,contato:x.c,mensagem:x.m,_subject:x.subject,_template:'table',_honey:''}),
+      body:JSON.stringify(payload(x)),
       signal:ctrl?ctrl.signal:undefined
     }).then(function(r){
       return r.json().catch(function(){return {}}).then(function(j){
