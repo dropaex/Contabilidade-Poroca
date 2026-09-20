@@ -51,7 +51,7 @@ h2{font-size:clamp(2.1rem,4.8vw,3.7rem)}
 /* ---------- navegação ---------- */
 .nav{
   position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:50;
-  width:min(760px,100% - 24px);
+  width:min(840px,100% - 24px);
   display:flex;align-items:center;justify-content:space-between;gap:16px;
   padding:7px 7px 7px 12px;border-radius:999px;
   background:var(--glass);
@@ -230,6 +230,25 @@ h2{font-size:clamp(2.1rem,4.8vw,3.7rem)}
 .card:hover h3::after{width:36px}
 .card p{color:var(--ink2);margin-top:10px;font-size:1rem;line-height:1.5}
 
+/* ---------- clientes ---------- */
+.cli{background:linear-gradient(180deg,var(--bg2),var(--bg))}
+.cli-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(36px,7vw,110px);align-items:center}
+.cli-side p{color:var(--ink2);margin-top:22px;max-width:36ch}
+.rows{border-radius:32px;background:var(--bg);border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden}
+.rows li+li{border-top:1px solid var(--line)}
+.row{display:flex;align-items:center;gap:20px;padding:24px 28px;transition:background .45s}
+.row:hover{background:var(--bg2)}
+.mono{
+  flex:none;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;
+  font-weight:650;font-size:1rem;letter-spacing:.02em;background:var(--bg3);color:var(--brand);
+  transition:background .4s,color .4s,transform .6s cubic-bezier(.2,.7,.2,1);
+}
+.row:hover .mono{background:var(--brand);color:var(--on-brand);transform:scale(1.07) rotate(-4deg)}
+.row h3{font-size:clamp(1.05rem,1.6vw,1.22rem);letter-spacing:-.016em;line-height:1.25;text-wrap:pretty}
+.row p{display:flex;align-items:center;gap:6px;margin-top:4px;color:var(--ink2);font-size:.95rem}
+.row p svg{width:15px;height:15px;flex:none;color:var(--brand)}
+@media (max-width:860px){.cli-grid{grid-template-columns:1fr}.row{padding:20px 20px}}
+
 /* ---------- diferencial ---------- */
 .dif{position:relative;height:280vh;background:var(--bg)}
 .stick{
@@ -337,7 +356,7 @@ h2{font-size:clamp(2.1rem,4.8vw,3.7rem)}
   .hi{opacity:1;animation:none}
   .js .rv{opacity:1;transform:none;transition:none}
   .js [data-split] .w>span{transform:none;transition:none}
-  .btn,.btn *,.card,.card *,.chip{transition:none!important}
+  .btn,.btn *,.card,.card *,.chip,.row,.mono{transition:none!important}
   .dif{height:auto}
   .stick{position:static;height:auto;min-height:auto;padding:clamp(88px,13vw,160px) 0}
 }
@@ -420,6 +439,7 @@ h2{font-size:clamp(2.1rem,4.8vw,3.7rem)}
     <li><a href="#historia">História</a></li>
     <li><a href="#giselle">Giselle</a></li>
     <li><a href="#servicos">Serviços</a></li>
+    <li><a href="#clientes">Clientes</a></li>
   </ul>
   <a class="btn btn-primary btn-sm" href="#contato" data-cta data-magnet>Fale conosco <span class="ar" aria-hidden="true">→</span></a>
 </nav>
@@ -552,6 +572,54 @@ h2{font-size:clamp(2.1rem,4.8vw,3.7rem)}
               <p>Orientação para decisões relacionadas ao negócio.</p>
             </div>
           </article>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CLIENTES -->
+  <section class="sec cli" id="clientes">
+    <div class="wrap cli-grid">
+      <div class="cli-side">
+        <h2 data-split>Clientes frequentes.</h2>
+        <p class="rv" style="--d:.15s">Empresas de Itamonte, Minas Gerais, que contam com a Contabilidade Poroca no dia a dia.</p>
+      </div>
+      <ul class="rows">
+        <li class="rv" style="--d:0.00s">
+          <div class="row">
+            <span class="mono" aria-hidden="true">SI</span>
+            <div>
+              <h3>Silma Indústria e Comércio Ltda</h3>
+              <p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>Itamonte, MG</p>
+            </div>
+          </div>
+        </li>
+        <li class="rv" style="--d:0.08s">
+          <div class="row">
+            <span class="mono" aria-hidden="true">IM</span>
+            <div>
+              <h3>Ita Móveis Ltda</h3>
+              <p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>Itamonte, MG</p>
+            </div>
+          </div>
+        </li>
+        <li class="rv" style="--d:0.16s">
+          <div class="row">
+            <span class="mono" aria-hidden="true">VF</span>
+            <div>
+              <h3>Varejo da Fazenda Dalgisa Pinto de Oliveira</h3>
+              <p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>Itamonte, MG</p>
+            </div>
+          </div>
+        </li>
+        <li class="rv" style="--d:0.24s">
+          <div class="row">
+            <span class="mono" aria-hidden="true">VR</span>
+            <div>
+              <h3>Vitoria Ribeiro de Oliveira Ltda</h3>
+              <p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>Itamonte, MG</p>
+            </div>
+          </div>
         </li>
       </ul>
     </div>
